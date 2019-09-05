@@ -1,4 +1,6 @@
-﻿namespace DeveVipAccess.Crypto
+﻿using OtpNet;
+
+namespace DeveVipAccess.Crypto
 {
     public static class Lenient
     {
@@ -11,7 +13,7 @@
             var data3 = data2 + extraPadding;
 
 
-            var base32bytes = Base32.ToBytes(data3);
+            var base32bytes = Base32Encoding.ToBytes(data3);
             return base32bytes;
         }
     }
