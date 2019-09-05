@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>DeveVipAccess</AssemblyName>
+    <PackageId>DeveVipAccess</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Version>1.0.0.0</Version>
+    <Title>DeveVipAccess</Title>
+    <Authors>Devedse</Authors>
+    <Description>This tool can be used to create a Symantec Vip Access token.</Description>
+    <PackageProjectUrl>https://github.com/devedse/DeveVipAccess</PackageProjectUrl>
+    <PackageTags>csharp;save;code;state</PackageTags>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+</Project>
