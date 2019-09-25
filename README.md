@@ -1,5 +1,5 @@
 # DeveVipAccess
-The goal of this project is to be able to generate a VIP Access Token. It's based on https://github.com/dlenski/python-vipaccess but then build in C#.
+The goal of this project is to be able to generate a VIP Access Token. It's based on https://github.com/dlenski/python-vipaccess and https://github.com/cyrozap/python-vipaccess but then build in C#.
 
 ## Build status
 
