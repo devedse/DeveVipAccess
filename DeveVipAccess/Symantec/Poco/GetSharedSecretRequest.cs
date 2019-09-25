@@ -73,7 +73,5 @@ namespace DeveVipAccess.Symantec.Poco
         public string Id { get; set; }
         [XmlAttribute(AttributeName = "Version")]
         public string Version { get; set; } = "2.0";
-        [XmlAttribute(AttributeName = "xmlns")]
-        public string Xmlns { get; set; } = "http://www.verisign.com/2006/08/vipservice";
     }
 }
