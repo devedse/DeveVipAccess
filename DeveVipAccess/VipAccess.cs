@@ -28,21 +28,27 @@ namespace DeveVipAccess
             return code;
         }
 
-        public static async Task<string> ProvisionTokenNow()
+        public static async Task<TokenInfo> ProvisionTokenNow()
         {
             var request = ProvisionToken.GenerateRequest();
 
             using (var httpClient = new HttpClient())
             {
-                var response = XmlHelper.Deserialize<GetSharedSecretResponse>(File.ReadAllText("Test.txt"));
-                //var response = await ProvisionToken.GetProvisioningResponse(httpClient, request);
+                var response = await ProvisionToken.GetProvisioningResponse(httpClient, request);
 
                 var otpToken = ProvisionToken.GetTokenFromResponse(response);
                 var otpSecret = ProvisionToken.DecryptKey(otpToken.Iv, otpToken.Cipher);
                 var otpSecretb32 = Base32Helper.Base32EncodeBytes(otpSecret).ToUpperInvariant();
+
+                if (await ProvisionToken.CheckToken(otpToken, otpSecret, httpClient))
+                {
+                    return new TokenInfo(1, otpSecretb32, otpToken);
+                }
+
+                throw new InvalidOperationException("Created token is not valid");
             }
 
-            return "";
+            throw new InvalidOperationException("Could not create a token");
         }
     }
 }

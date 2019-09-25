@@ -2,6 +2,7 @@
 using DeveVipAccess.Symantec.Poco;
 using OtpNet;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,6 +15,7 @@ namespace DeveVipAccess.Symantec
     public static class ProvisionToken
     {
         public const string PROVISIONING_URL = "https://services.vip.symantec.com/prov";
+        public const string TEST_URL = "https://vip.symantec.com/otpCheck";
 
         private const string TOKEN_ENCRYPTION_KEY_STRING = "\x01\xad\x9b\xc6\x82\xa3\xaa\x93\xa9\xa3\x23\x9a\x86\xd6\xcc\xd9";
         private static readonly byte[] TOKEN_ENCRYPTION_KEY = TOKEN_ENCRYPTION_KEY_STRING.Select(x => Convert.ToByte(x)).ToArray();
@@ -125,6 +127,39 @@ namespace DeveVipAccess.Symantec
             var decrypted = decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
 
             return decrypted;
+        }
+
+        public static async Task<bool> CheckToken(Token token, byte[] otpSecret, HttpClient httpClient)
+        {
+            var totp = new Totp(otpSecret, token.Period);
+            var totpToken = totp.ComputeTotp(DateTime.UtcNow);
+
+            var data = new List<string>();
+            data.AddRange(totpToken.Select((t, i) => $"cr{i + 1}={t}"));
+            data.Add($"cred={token.Id}");
+            data.Add("continue=otp_check");
+            var request = string.Join("&", data);
+
+
+            var content = new StringContent(request, Encoding.UTF8, "application/x-www-form-urlencoded");
+
+            var req = new HttpRequestMessage(HttpMethod.Post, TEST_URL);
+            req.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("*/*"));
+
+            req.Content = content;
+
+            var result = await httpClient.SendAsync(req);
+
+            var resultTxt = await result.Content.ReadAsStringAsync();
+
+            if (resultTxt.Contains("Your VIP Credential is working correctly"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
