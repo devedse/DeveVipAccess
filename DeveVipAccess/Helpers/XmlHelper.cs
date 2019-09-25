@@ -12,7 +12,7 @@ namespace DeveVipAccess.Helpers
             using (var memstream = new MemoryStream())
             {
                 serializer.Serialize(memstream, obj);
-                return Encoding.UTF8.GetString(memstream.GetBuffer());
+                return Encoding.UTF8.GetString(memstream.ToArray());
             }
         }
 

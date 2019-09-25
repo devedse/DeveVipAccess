@@ -1,8 +1,12 @@
 ﻿using DeveVipAccess.Crypto;
+using DeveVipAccess.Helpers;
 using DeveVipAccess.Symantec;
+using DeveVipAccess.Symantec.Poco;
 using OtpNet;
 using System;
+using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace DeveVipAccess
 {
@@ -24,16 +28,17 @@ namespace DeveVipAccess
             return code;
         }
 
-        public static string ProvisionTokenNow()
+        public static async Task<string> ProvisionTokenNow()
         {
             var request = ProvisionToken.GenerateRequest();
 
             using (var httpClient = new HttpClient())
             {
-
+                var resp = XmlHelper.Deserialize<GetSharedSecretResponse>(File.ReadAllText("Test.txt"));
+                //var resp = await ProvisionToken.GetProvisioningResponse(httpClient, request);
             }
 
-                return "";
+            return "";
         }
     }
 }

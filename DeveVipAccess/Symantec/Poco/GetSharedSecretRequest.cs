@@ -59,7 +59,7 @@ namespace DeveVipAccess.Symantec.Poco
     {
         [XmlElement(ElementName = "TokenModel", Namespace = "http://www.verisign.com/2006/08/vipservice")]
         public string TokenModel { get; set; }
-        [XmlElement(ElementName = "ActivationCode", IsNullable = true, Namespace = "http://www.verisign.com/2006/08/vipservice")]
+        [XmlElement(ElementName = "ActivationCode", Namespace = "http://www.verisign.com/2006/08/vipservice")]
         public string ActivationCode { get; set; }
         [XmlElement(ElementName = "OtpAlgorithm", Namespace = "http://www.verisign.com/2006/08/vipservice")]
         public OtpAlgorithm OtpAlgorithm { get; set; }
@@ -75,7 +75,5 @@ namespace DeveVipAccess.Symantec.Poco
         public string Version { get; set; } = "2.0";
         [XmlAttribute(AttributeName = "xmlns")]
         public string Xmlns { get; set; } = "http://www.verisign.com/2006/08/vipservice";
-        [XmlAttribute(AttributeName = "xsi", Namespace = "http://www.w3.org/2000/xmlns/")]
-        public string Xsi { get; set; } = "http://www.w3.org/2001/XMLSchema-instance";
     }
 }

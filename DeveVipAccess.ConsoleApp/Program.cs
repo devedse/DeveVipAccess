@@ -1,14 +1,23 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace DeveVipAccess.ConsoleApp
 {
-    class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static async Task MainAsync(string[] args)
+        {
+            var test = await VipAccess.ProvisionTokenNow();
+        }
+
+        public static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
-            var test = VipAccess.ProvisionTokenNow();
+            MainAsync(args).GetAwaiter().GetResult();
+
+            Console.WriteLine("Press enter to exit...");
+            Console.ReadLine();
         }
     }
 }

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<GetSharedSecretResponse RequestId="1569416938" Version="2.0" xmlns="http://www.verisign.com/2006/08/vipservice">
+  <Status>
+    <ReasonCode>0000</ReasonCode>
+    <StatusMessage>Success</StatusMessage>
+  </Status>
+  <SharedSecretDeliveryMethod>HTTPS</SharedSecretDeliveryMethod>
+  <SecretContainer Version="1.0">
+    <EncryptionMethod>
+      <PBESalt>bItVnOIHHAf13JeLf8kuLKdl4mQ=</PBESalt>
+      <PBEIterationCount>50</PBEIterationCount>
+      <IV>eAnZ1vxby4MvHWK2pc6HdQ==</IV>
+    </EncryptionMethod>
+    <Device>
+      <Secret type="HOTP" Id="VSST11113681">
+        <Issuer>OU = ID Protection Center, O = Symantec</Issuer>
+        <Usage otp="true">
+          <AI type="HMAC-SHA1-TRUNC-6DIGITS"/>
+          <TimeStep>30</TimeStep>
+          <Time>0</Time>
+          <ClockDrift>4</ClockDrift>
+        </Usage>
+        <FriendlyName>OU = ID Protection Center, O = Symantec</FriendlyName>
+        <Data>
+          <Cipher>vclJg5Xjq+yiyjcYO2/PukVthnpl6/1XCDZQmSnHbYM=</Cipher>
+          <Digest algorithm="HMAC-SHA1">cmhoL299+Ho9U9lk9lCJrV8nkFo=</Digest>
+        </Data>
+        <Expiry>2022-09-24T13:09:08.114Z</Expiry>
+      </Secret>
+    </Device>
+  </SecretContainer>
+  <UTCTimestamp>1569416948</UTCTimestamp>
+</GetSharedSecretResponse>

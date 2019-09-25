@@ -3,8 +3,10 @@ using DeveVipAccess.Helpers;
 using DeveVipAccess.Symantec.Poco;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,13 +57,28 @@ namespace DeveVipAccess.Symantec
 
             var serialized = XmlHelper.Serialize(srss);
 
+            //var blahhh = serialized.Replace("  ", "\t");
+            var fixedSerialized = serialized.Replace("vip:", "");
 
-            return serialized;
+            return fixedSerialized;
         }
 
-        public static async Task<HttpResponseMessage> GetProvisioningResponse(HttpClient httpClient, string request)
+        public static async Task<GetSharedSecretResponse> GetProvisioningResponse(HttpClient httpClient, string request)
         {
-            var retval = await httpClient.PostAsync(PROVISIONING_URL, new StringContent(request));
+            var content = new StringContent(request, Encoding.UTF8, "application/xml");
+
+            var req = new HttpRequestMessage(HttpMethod.Post, PROVISIONING_URL);
+            req.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("*/*"));
+            req.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
+            req.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
+
+            req.Content = content;
+
+            var result = await httpClient.SendAsync(req);
+
+            var resultTxt = await result.Content.ReadAsStringAsync();
+
+            var retval = XmlHelper.Deserialize<GetSharedSecretResponse>(resultTxt);
             return retval;
         }
     }
