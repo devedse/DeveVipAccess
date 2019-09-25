@@ -1,6 +1,8 @@
 ﻿using DeveVipAccess.Crypto;
+using DeveVipAccess.Symantec;
 using OtpNet;
 using System;
+using System.Net.Http;
 
 namespace DeveVipAccess
 {
@@ -20,6 +22,18 @@ namespace DeveVipAccess
 
             var code = totp.ComputeTotp(utcTime ?? DateTime.UtcNow);
             return code;
+        }
+
+        public static string ProvisionTokenNow()
+        {
+            var request = ProvisionToken.GenerateRequest();
+
+            using (var httpClient = new HttpClient())
+            {
+
+            }
+
+                return "";
         }
     }
 }

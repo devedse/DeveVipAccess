@@ -24,7 +24,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 using System;
-using System.Globalization;
 
 namespace OtpNet
 {
@@ -37,14 +36,7 @@ namespace OtpNet
     /// </remarks>
     public class Totp : Otp
     {
-        /// <summary>
-        /// The number of ticks as Measured at Midnight Jan 1st 1970;
-        /// </summary>
-        const long unixEpochTicks = 621355968000000000L;
-        /// <summary>
-        /// A divisor for converting ticks to seconds
-        /// </summary>
-        const long ticksToSeconds = 10000000L;
+
 
         private readonly int step;
         private readonly int totpSize;
@@ -67,17 +59,25 @@ namespace OtpNet
             this.totpSize = totpSize;
 
             // we never null check the corrected time object.  Since it's readonly, we'll ensure that it isn't null here and provide neatral functionality in this case.
-            this.correctedTime = timeCorrection ?? TimeCorrection.UncorrectedInstance;
+            correctedTime = timeCorrection ?? TimeCorrection.UncorrectedInstance;
         }
 
         private static void VerifyParameters(int step, int totpSize)
         {
-            if(!(step > 0))
+            if (!(step > 0))
+            {
                 throw new ArgumentOutOfRangeException("step");
-            if(!(totpSize > 0))
+            }
+
+            if (!(totpSize > 0))
+            {
                 throw new ArgumentOutOfRangeException("totpSize");
-            if(!(totpSize <= 10))
+            }
+
+            if (!(totpSize <= 10))
+            {
                 throw new ArgumentOutOfRangeException("totpSize");
+            }
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace OtpNet
         /// <returns>a TOTP value</returns>
         public string ComputeTotp(DateTime timestamp)
         {
-            return ComputeTotpFromSpecificTime(this.correctedTime.GetCorrectedTime(timestamp));
+            return ComputeTotpFromSpecificTime(correctedTime.GetCorrectedTime(timestamp));
         }
 
         /// <summary>
@@ -99,13 +99,13 @@ namespace OtpNet
         /// <returns>a TOTP value</returns>
         public string ComputeTotp()
         {
-            return this.ComputeTotpFromSpecificTime(this.correctedTime.CorrectedUtcNow);
+            return ComputeTotpFromSpecificTime(correctedTime.CorrectedUtcNow);
         }
 
         private string ComputeTotpFromSpecificTime(DateTime timestamp)
         {
-            var window = CalculateTimeStepFromTimestamp(timestamp);
-            return this.Compute(window, this.hashMode);
+            var window = UnixTimestampHelper.CalculateTimeStepFromTimestamp(timestamp, step);
+            return Compute(window, hashMode);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace OtpNet
         /// <returns>True if there is a match.</returns>
         public bool VerifyTotp(string totp, out long timeStepMatched, VerificationWindow window = null)
         {
-            return this.VerifyTotpForSpecificTime(this.correctedTime.CorrectedUtcNow, totp, window, out timeStepMatched);
+            return VerifyTotpForSpecificTime(correctedTime.CorrectedUtcNow, totp, window, out timeStepMatched);
         }
 
         /// <summary>
@@ -141,23 +141,13 @@ namespace OtpNet
         /// <returns>True if there is a match.</returns>
         public bool VerifyTotp(DateTime timestamp, string totp, out long timeStepMatched, VerificationWindow window = null)
         {
-            return this.VerifyTotpForSpecificTime(this.correctedTime.GetCorrectedTime(timestamp), totp, window, out timeStepMatched);
+            return VerifyTotpForSpecificTime(correctedTime.GetCorrectedTime(timestamp), totp, window, out timeStepMatched);
         }
 
         private bool VerifyTotpForSpecificTime(DateTime timestamp, string totp, VerificationWindow window, out long timeStepMatched)
         {
-            var initialStep = CalculateTimeStepFromTimestamp(timestamp);
-            return this.Verify(initialStep, totp, out timeStepMatched, window);
-        }
-
-        /// <summary>
-        /// Takes a timestamp and calculates a time step
-        /// </summary>
-        private long CalculateTimeStepFromTimestamp(DateTime timestamp)
-        {
-            var unixTimestamp = (timestamp.Ticks - unixEpochTicks) / ticksToSeconds;
-            var window = unixTimestamp / (long)this.step;
-            return window;
+            var initialStep = UnixTimestampHelper.CalculateTimeStepFromTimestamp(timestamp, step);
+            return Verify(initialStep, totp, out timeStepMatched, window);
         }
 
         /// <summary>
@@ -169,7 +159,7 @@ namespace OtpNet
         /// <returns>Number of remaining seconds</returns>
         public int RemainingSeconds()
         {
-            return RemainingSecondsForSpecificTime(this.correctedTime.CorrectedUtcNow);
+            return UnixTimestampHelper.RemainingSecondsForSpecificTime(correctedTime.CorrectedUtcNow, step);
         }
 
         /// <summary>
@@ -179,13 +169,10 @@ namespace OtpNet
         /// <returns>Number of remaining seconds</returns>
         public int RemainingSeconds(DateTime timestamp)
         {
-            return RemainingSecondsForSpecificTime(this.correctedTime.GetCorrectedTime(timestamp));
+            return UnixTimestampHelper.RemainingSecondsForSpecificTime(correctedTime.GetCorrectedTime(timestamp), step);
         }
 
-        private int RemainingSecondsForSpecificTime(DateTime timestamp)
-        {
-            return this.step - (int)(((timestamp.Ticks - unixEpochTicks) / ticksToSeconds) % this.step);
-        }
+
 
         /// <summary>
         /// Takes a time step and computes a TOTP code
@@ -196,8 +183,8 @@ namespace OtpNet
         protected override string Compute(long counter, OtpHashMode mode)
         {
             var data = KeyUtilities.GetBigEndianBytes(counter);
-            var otp = this.CalculateOtp(data, mode);
-            return Digits(otp, this.totpSize);
+            var otp = CalculateOtp(data, mode);
+            return Digits(otp, totpSize);
         }
     }
 }
