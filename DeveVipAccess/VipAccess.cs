@@ -38,6 +38,8 @@ namespace DeveVipAccess
                 //var response = await ProvisionToken.GetProvisioningResponse(httpClient, request);
 
                 var otpToken = ProvisionToken.GetTokenFromResponse(response);
+                var otpSecret = ProvisionToken.DecryptKey(otpToken.Iv, otpToken.Cipher);
+                var otpSecretb32 = Base32Helper.Base32EncodeBytes(otpSecret).ToUpperInvariant();
             }
 
             return "";

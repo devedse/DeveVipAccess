@@ -2,8 +2,10 @@
 using DeveVipAccess.Symantec.Poco;
 using OtpNet;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +14,9 @@ namespace DeveVipAccess.Symantec
     public static class ProvisionToken
     {
         public const string PROVISIONING_URL = "https://services.vip.symantec.com/prov";
+
+        private const string TOKEN_ENCRYPTION_KEY_STRING = "\x01\xad\x9b\xc6\x82\xa3\xaa\x93\xa9\xa3\x23\x9a\x86\xd6\xcc\xd9";
+        private static readonly byte[] TOKEN_ENCRYPTION_KEY = TOKEN_ENCRYPTION_KEY_STRING.Select(x => Convert.ToByte(x)).ToArray();
 
         public static string GenerateRequest()
         {
@@ -78,19 +83,19 @@ namespace DeveVipAccess.Symantec
             return retval;
         }
 
-        public static object GetTokenFromResponse(GetSharedSecretResponse response)
+        public static Token GetTokenFromResponse(GetSharedSecretResponse response)
         {
             var unixTime = UnixTimestampHelper.ConvertToUnixTimeStamp(DateTime.UtcNow);
 
             var token = new Token()
             {
                 TimeSkew = unixTime - long.Parse(response.UTCTimestamp),
-                Salt = Base64Helper.Base64Decode(response.SecretContainer.EncryptionMethod.PBESalt),
+                Salt = Base64Helper.Base64DecodeBytes(response.SecretContainer.EncryptionMethod.PBESalt),
                 IterationCount = int.Parse(response.SecretContainer.EncryptionMethod.PBEIterationCount),
-                Iv = Base64Helper.Base64Decode(response.SecretContainer.EncryptionMethod.IV),
+                Iv = Base64Helper.Base64DecodeBytes(response.SecretContainer.EncryptionMethod.IV),
                 Id = response.SecretContainer.Device.Secret.Id,
-                Cipher = Base64Helper.Base64Decode(response.SecretContainer.Device.Secret.Data.Cipher),
-                Digest = Base64Helper.Base64Decode(response.SecretContainer.Device.Secret.Data.Digest.Text),
+                Cipher = Base64Helper.Base64DecodeBytes(response.SecretContainer.Device.Secret.Data.Cipher),
+                Digest = Base64Helper.Base64DecodeBytes(response.SecretContainer.Device.Secret.Data.Digest.Text),
                 Expiry = response.SecretContainer.Device.Secret.Expiry,
                 Period = int.Parse(response.SecretContainer.Device.Secret.Usage.TimeStep),
                 Counter = int.Parse(response.SecretContainer.Device.Secret.Usage.Counter ?? "0")
@@ -110,6 +115,16 @@ namespace DeveVipAccess.Symantec
             }
 
             return token;
+        }
+
+        public static byte[] DecryptKey(byte[] iv, byte[] cipher)
+        {
+            var aes = Aes.Create();
+            var decryptor = aes.CreateDecryptor(TOKEN_ENCRYPTION_KEY, iv);
+
+            var decrypted = decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
+
+            return decrypted;
         }
     }
 }
