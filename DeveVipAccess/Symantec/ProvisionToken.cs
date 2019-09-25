@@ -1,13 +1,9 @@
-﻿using DeveVipAccess.Crypto;
-using DeveVipAccess.Helpers;
+﻿using DeveVipAccess.Helpers;
 using DeveVipAccess.Symantec.Poco;
+using OtpNet;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -80,6 +76,40 @@ namespace DeveVipAccess.Symantec
 
             var retval = XmlHelper.Deserialize<GetSharedSecretResponse>(resultTxt);
             return retval;
+        }
+
+        public static object GetTokenFromResponse(GetSharedSecretResponse response)
+        {
+            var unixTime = UnixTimestampHelper.ConvertToUnixTimeStamp(DateTime.UtcNow);
+
+            var token = new Token()
+            {
+                TimeSkew = unixTime - long.Parse(response.UTCTimestamp),
+                Salt = Base64Helper.Base64Decode(response.SecretContainer.EncryptionMethod.PBESalt),
+                IterationCount = int.Parse(response.SecretContainer.EncryptionMethod.PBEIterationCount),
+                Iv = Base64Helper.Base64Decode(response.SecretContainer.EncryptionMethod.IV),
+                Id = response.SecretContainer.Device.Secret.Id,
+                Cipher = Base64Helper.Base64Decode(response.SecretContainer.Device.Secret.Data.Cipher),
+                Digest = Base64Helper.Base64Decode(response.SecretContainer.Device.Secret.Data.Digest.Text),
+                Expiry = response.SecretContainer.Device.Secret.Expiry,
+                Period = int.Parse(response.SecretContainer.Device.Secret.Usage.TimeStep),
+                Counter = int.Parse(response.SecretContainer.Device.Secret.Usage.Counter ?? "0")
+            };
+
+            var alg = response.SecretContainer.Device.Secret.Usage.AI.Type;
+            var algSplitted = alg.Split('-');
+
+            if (algSplitted.Length == 4 && algSplitted[0] == "HMAC" && algSplitted[2] == "TRUNC" && algSplitted[3].EndsWith("DIGITS"))
+            {
+                token.Algorithm = algSplitted[1].ToLowerInvariant();
+                token.Digits = int.Parse(algSplitted[3].Substring(0, algSplitted[3].Length - 6));
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unknown algorithm: {alg}");
+            }
+
+            return token;
         }
     }
 }

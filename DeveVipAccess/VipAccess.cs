@@ -34,8 +34,10 @@ namespace DeveVipAccess
 
             using (var httpClient = new HttpClient())
             {
-                var resp = XmlHelper.Deserialize<GetSharedSecretResponse>(File.ReadAllText("Test.txt"));
-                //var resp = await ProvisionToken.GetProvisioningResponse(httpClient, request);
+                var response = XmlHelper.Deserialize<GetSharedSecretResponse>(File.ReadAllText("Test.txt"));
+                //var response = await ProvisionToken.GetProvisioningResponse(httpClient, request);
+
+                var otpToken = ProvisionToken.GetTokenFromResponse(response);
             }
 
             return "";

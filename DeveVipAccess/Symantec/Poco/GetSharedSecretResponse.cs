@@ -36,6 +36,8 @@ namespace DeveVipAccess.Symantec.Poco
         public AI AI { get; set; }
         [XmlElement(ElementName = "TimeStep", Namespace = "http://www.verisign.com/2006/08/vipservice")]
         public string TimeStep { get; set; }
+        [XmlElement(ElementName = "Counter", Namespace = "http://www.verisign.com/2006/08/vipservice")]
+        public string Counter { get; set; }
         [XmlElement(ElementName = "Time", Namespace = "http://www.verisign.com/2006/08/vipservice")]
         public string Time { get; set; }
         [XmlElement(ElementName = "ClockDrift", Namespace = "http://www.verisign.com/2006/08/vipservice")]
