@@ -53,7 +53,7 @@ namespace OtpNet
         /// </summary>
         private TimeCorrection()
         {
-            this.timeCorrectionFactor = TimeSpan.FromSeconds(0);
+            timeCorrectionFactor = TimeSpan.FromSeconds(0);
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace OtpNet
         /// <param name="correctUtc">The current correct UTC time</param>
         public TimeCorrection(DateTime correctUtc)
         {
-            this.timeCorrectionFactor = DateTime.UtcNow - correctUtc;
+            timeCorrectionFactor = DateTime.UtcNow - correctUtc;
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace OtpNet
         /// <param name="referenceTime">The current reference time (time that will have the correction factor applied in subsequent calls)</param>
         public TimeCorrection(DateTime correctTime, DateTime referenceTime)
         {
-            this.timeCorrectionFactor = referenceTime - correctTime;
+            timeCorrectionFactor = referenceTime - correctTime;
         }
 
         /// <summary>
@@ -91,17 +91,11 @@ namespace OtpNet
         /// <summary>
         /// Applies the correction factor to the current system UTC time and returns a corrected time
         /// </summary>
-        public DateTime CorrectedUtcNow
-        {
-            get { return GetCorrectedTime(DateTime.UtcNow); }
-        }
+        public DateTime CorrectedUtcNow => GetCorrectedTime(DateTime.UtcNow);
 
         /// <summary>
         /// The timespan that is used to calculate a corrected time
         /// </summary>
-        public TimeSpan CorrectionFactor
-        {
-            get { return this.timeCorrectionFactor; }
-        }
+        public TimeSpan CorrectionFactor => timeCorrectionFactor;
     }
 }

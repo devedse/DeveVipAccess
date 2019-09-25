@@ -49,11 +49,10 @@ namespace OtpNet
     /// </remarks>
     public class InMemoryKey : IKeyProvider
     {
-        static readonly object platformSupportSync = new object();
-
-        readonly object stateSync = new object();
-        readonly byte[] KeyData;
-        readonly int keyLength;
+        private static readonly object platformSupportSync = new object();
+        private readonly object stateSync = new object();
+        private readonly byte[] KeyData;
+        private readonly int keyLength;
 
         /// <summary>
         /// Creates an instance of a key.
@@ -61,15 +60,20 @@ namespace OtpNet
         /// <param name="key">Plaintext key data</param>
         public InMemoryKey(byte[] key)
         {
-            if(!(key != null))
+            if (!(key != null))
+            {
                 throw new ArgumentNullException("key");
-            if(!(key.Length > 0))
-                throw new ArgumentException("The key must not be empty");
+            }
 
-            this.keyLength = key.Length;
-            int paddedKeyLength = (int)Math.Ceiling((decimal)key.Length / (decimal)16) * 16;
-            this.KeyData = new byte[paddedKeyLength];
-            Array.Copy(key, this.KeyData, key.Length);
+            if (!(key.Length > 0))
+            {
+                throw new ArgumentException("The key must not be empty");
+            }
+
+            keyLength = key.Length;
+            int paddedKeyLength = (int)Math.Ceiling(key.Length / (decimal)16) * 16;
+            KeyData = new byte[paddedKeyLength];
+            Array.Copy(key, KeyData, key.Length);
         }
 
         /// <summary>
@@ -81,10 +85,10 @@ namespace OtpNet
         /// <returns>Plaintext Key</returns>
         internal byte[] GetCopyOfKey()
         {
-            var plainKey = new byte[this.keyLength];
-            lock(this.stateSync)
+            var plainKey = new byte[keyLength];
+            lock (stateSync)
             {
-                Array.Copy(this.KeyData, plainKey, this.keyLength);
+                Array.Copy(KeyData, plainKey, keyLength);
             }
             return plainKey;
         }
@@ -98,9 +102,9 @@ namespace OtpNet
         public byte[] ComputeHmac(OtpHashMode mode, byte[] data)
         {
             byte[] hashedValue = null;
-            using(HMAC hmac = CreateHmacHash(mode))
+            using (HMAC hmac = CreateHmacHash(mode))
             {
-                byte[] key = this.GetCopyOfKey();
+                byte[] key = GetCopyOfKey();
                 try
                 {
                     hmac.Key = key;
@@ -121,7 +125,7 @@ namespace OtpNet
         private static HMAC CreateHmacHash(OtpHashMode otpHashMode)
         {
             HMAC hmacAlgorithm = null;
-            switch(otpHashMode)
+            switch (otpHashMode)
             {
                 case OtpHashMode.Sha256:
                     hmacAlgorithm = new HMACSHA256();

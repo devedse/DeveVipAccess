@@ -11,7 +11,7 @@ namespace OtpNet
     {
         public static byte[] ToBytes(string input)
         {
-            if(string.IsNullOrEmpty(input))
+            if (string.IsNullOrEmpty(input))
             {
                 throw new ArgumentNullException("input");
             }
@@ -23,11 +23,11 @@ namespace OtpNet
             byte curByte = 0, bitsRemaining = 8;
             int mask = 0, arrayIndex = 0;
 
-            foreach(char c in input)
+            foreach (char c in input)
             {
                 int cValue = CharToValue(c);
 
-                if(bitsRemaining > 5)
+                if (bitsRemaining > 5)
                 {
                     mask = cValue << (bitsRemaining - 5);
                     curByte = (byte)(curByte | mask);
@@ -44,7 +44,7 @@ namespace OtpNet
             }
 
             //if we didn't end with a full byte
-            if(arrayIndex != byteCount)
+            if (arrayIndex != byteCount)
             {
                 returnArray[arrayIndex] = curByte;
             }
@@ -54,7 +54,7 @@ namespace OtpNet
 
         public static string ToString(byte[] input)
         {
-            if(input == null || input.Length == 0)
+            if (input == null || input.Length == 0)
             {
                 throw new ArgumentNullException("input");
             }
@@ -65,12 +65,12 @@ namespace OtpNet
             byte nextChar = 0, bitsRemaining = 5;
             int arrayIndex = 0;
 
-            foreach(byte b in input)
+            foreach (byte b in input)
             {
                 nextChar = (byte)(nextChar | (b >> (8 - bitsRemaining)));
                 returnArray[arrayIndex++] = ValueToChar(nextChar);
 
-                if(bitsRemaining < 4)
+                if (bitsRemaining < 4)
                 {
                     nextChar = (byte)((b >> (3 - bitsRemaining)) & 31);
                     returnArray[arrayIndex++] = ValueToChar(nextChar);
@@ -82,10 +82,13 @@ namespace OtpNet
             }
 
             //if we didn't end with a full char
-            if(arrayIndex != charCount)
+            if (arrayIndex != charCount)
             {
                 returnArray[arrayIndex++] = ValueToChar(nextChar);
-                while(arrayIndex != charCount) returnArray[arrayIndex++] = '='; //padding
+                while (arrayIndex != charCount)
+                {
+                    returnArray[arrayIndex++] = '='; //padding
+                }
             }
 
             return new string(returnArray);
@@ -93,20 +96,20 @@ namespace OtpNet
 
         private static int CharToValue(char c)
         {
-            int value = (int)c;
+            int value = c;
 
             //65-90 == uppercase letters
-            if(value < 91 && value > 64)
+            if (value < 91 && value > 64)
             {
                 return value - 65;
             }
             //50-55 == numbers 2-7
-            if(value < 56 && value > 49)
+            if (value < 56 && value > 49)
             {
                 return value - 24;
             }
             //97-122 == lowercase letters
-            if(value < 123 && value > 96)
+            if (value < 123 && value > 96)
             {
                 return value - 97;
             }
@@ -116,12 +119,12 @@ namespace OtpNet
 
         private static char ValueToChar(byte b)
         {
-            if(b < 26)
+            if (b < 26)
             {
                 return (char)(b + 65);
             }
 
-            if(b < 32)
+            if (b < 32)
             {
                 return (char)(b + 24);
             }

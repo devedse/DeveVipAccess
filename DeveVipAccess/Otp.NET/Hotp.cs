@@ -54,10 +54,15 @@ namespace OtpNet
 
         private static void VerifyParameters(int hotpSize)
         {
-            if(!(hotpSize >= 6))
+            if (!(hotpSize >= 6))
+            {
                 throw new ArgumentOutOfRangeException("hotpSize");
-            if(!(hotpSize <= 8))
+            }
+
+            if (!(hotpSize <= 8))
+            {
                 throw new ArgumentOutOfRangeException("hotpSize");
+            }
         }
 
         /// <summary>
@@ -67,7 +72,7 @@ namespace OtpNet
         /// <returns>a HOTP value</returns>
         public string ComputeHOTP(long counter)
         {
-            return this.Compute(counter, this.hashMode);
+            return Compute(counter, hashMode);
         }
 
         /// <summary>
@@ -78,7 +83,7 @@ namespace OtpNet
         /// <returns>True if there is a match.</returns>
         public bool VerifyHotp(string hotp, long counter)
         {
-            if(hotp == ComputeHOTP(counter))
+            if (hotp == ComputeHOTP(counter))
             {
                 return true;
             }
@@ -97,8 +102,8 @@ namespace OtpNet
         protected override string Compute(long counter, OtpHashMode mode)
         {
             var data = KeyUtilities.GetBigEndianBytes(counter);
-            var otp = this.CalculateOtp(data, mode);
-            return Digits(otp, this.hotpSize);
+            var otp = CalculateOtp(data, mode);
+            return Digits(otp, hotpSize);
         }
     }
 }

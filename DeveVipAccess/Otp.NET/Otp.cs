@@ -24,7 +24,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 using System;
-using System.Security.Cryptography;
 
 namespace OtpNet
 {
@@ -53,15 +52,20 @@ namespace OtpNet
         /// <param name="mode">The hash mode to use</param>
         public Otp(byte[] secretKey, OtpHashMode mode)
         {
-            if(!(secretKey != null))
+            if (!(secretKey != null))
+            {
                 throw new ArgumentNullException("secretKey");
-            if(!(secretKey.Length > 0))
+            }
+
+            if (!(secretKey.Length > 0))
+            {
                 throw new ArgumentException("secretKey empty");
+            }
 
             // when passing a key into the constructor the caller may depend on the reference to the key remaining intact.
             this.secretKey = new InMemoryKey(secretKey);
 
-            this.hashMode = mode;
+            hashMode = mode;
         }
 
         /// <summary>
@@ -77,7 +81,7 @@ namespace OtpNet
         /// </summary>
         protected internal long CalculateOtp(byte[] data, OtpHashMode mode)
         {
-            byte[] hmacComputedHash = this.secretKey.ComputeHmac(mode, data);
+            byte[] hmacComputedHash = secretKey.ComputeHmac(mode, data);
 
             // The RFC has a hard coded index 19 in this value.
             // This is the same thing but also accomodates SHA256 and SHA512
@@ -109,12 +113,15 @@ namespace OtpNet
         /// <returns>True if a match is found</returns>
         protected bool Verify(long initialStep, string valueToVerify, out long matchedStep, VerificationWindow window)
         {
-            if(window == null)
-                window = new VerificationWindow();
-            foreach(var frame in window.ValidationCandidates(initialStep))
+            if (window == null)
             {
-                var comparisonValue = this.Compute(frame, this.hashMode);
-                if(ValuesEqual(comparisonValue, valueToVerify))
+                window = new VerificationWindow();
+            }
+
+            foreach (var frame in window.ValidationCandidates(initialStep))
+            {
+                var comparisonValue = Compute(frame, hashMode);
+                if (ValuesEqual(comparisonValue, valueToVerify))
                 {
                     matchedStep = frame;
                     return true;
@@ -128,13 +135,13 @@ namespace OtpNet
         // Constant time comparison of two values
         private bool ValuesEqual(string a, string b)
         {
-            if(a.Length != b.Length)
+            if (a.Length != b.Length)
             {
                 return false;
             }
 
             var result = 0;
-            for(int i = 0; i < a.Length; i++)
+            for (int i = 0; i < a.Length; i++)
             {
                 result |= a[i] ^ b[i];
             }

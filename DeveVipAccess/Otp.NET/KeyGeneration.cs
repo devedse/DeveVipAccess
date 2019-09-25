@@ -41,7 +41,7 @@ namespace OtpNet
         public static byte[] GenerateRandomKey(int length)
         {
             byte[] key = new byte[length];
-            using(var rnd = RandomNumberGenerator.Create())
+            using (var rnd = RandomNumberGenerator.Create())
             {
                 rnd.GetBytes(key);
                 return key;
@@ -67,8 +67,11 @@ namespace OtpNet
         /// <returns>Derived key</returns>
         public static byte[] DeriveKeyFromMaster(IKeyProvider masterKey, byte[] publicIdentifier, OtpHashMode mode = OtpHashMode.Sha1)
         {
-            if(masterKey == null)
+            if (masterKey == null)
+            {
                 throw new ArgumentNullException("masterKey");
+            }
+
             return masterKey.ComputeHmac(mode, publicIdentifier);
         }
 
@@ -86,7 +89,7 @@ namespace OtpNet
 
         private static HashAlgorithm GetHashAlgorithmForMode(OtpHashMode mode)
         {
-            switch(mode)
+            switch (mode)
             {
                 case OtpHashMode.Sha256:
                     return SHA256.Create();
@@ -99,7 +102,7 @@ namespace OtpNet
 
         private static int LengthForMode(OtpHashMode mode)
         {
-            switch(mode)
+            switch (mode)
             {
                 case OtpHashMode.Sha256:
                     return 32;

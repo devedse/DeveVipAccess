@@ -54,16 +54,21 @@ namespace OtpNet
         public IEnumerable<long> ValidationCandidates(long initialFrame)
         {
             yield return initialFrame;
-            for(int i = 1; i <= previous; i++)
+            for (int i = 1; i <= previous; i++)
             {
                 var val = initialFrame - i;
-                if(val < 0)
+                if (val < 0)
+                {
                     break;
+                }
+
                 yield return val;
             }
 
-            for(int i = 1; i <= future; i++)
+            for (int i = 1; i <= future; i++)
+            {
                 yield return initialFrame + i;
+            }
         }
 
         /// <summary>

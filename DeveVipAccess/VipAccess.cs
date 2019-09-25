@@ -4,7 +4,6 @@ using DeveVipAccess.Symantec;
 using DeveVipAccess.Symantec.Poco;
 using OtpNet;
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 

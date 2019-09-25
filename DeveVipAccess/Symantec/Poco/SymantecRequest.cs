@@ -2,16 +2,14 @@
 using DeveVipAccess.Helpers;
 using OtpNet;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace DeveVipAccess.Symantec.Poco
 {
     public class SymantecRequest
     {
         private const string HMAC_KEY_STRING = "\xdd\x0b\xa6\x92\xc3\x8a\xa3\xa9\x93\xa3\xaa\x26\x96\x8c\xd9\xc2\xaa\x2a\xa2\xcb\x23\xb7\xc2\xd2\xaa\xaf\x8f\x8f\xc9\xa0\xa9\xa1";
-        private static byte[] HMAC_KEY = HMAC_KEY_STRING.Select(x => Convert.ToByte(x)).ToArray();
+        private static readonly byte[] HMAC_KEY = HMAC_KEY_STRING.Select(x => Convert.ToByte(x)).ToArray();
 
         public long timestamp { get; set; }
         public string token_model { get; set; } = "VSST";

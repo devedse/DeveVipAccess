@@ -45,8 +45,11 @@ namespace OtpNet
         /// </remarks>
         internal static void Destroy(byte[] sensitiveData)
         {
-            if(sensitiveData == null)
+            if (sensitiveData == null)
+            {
                 throw new ArgumentNullException("sensitiveData");
+            }
+
             new Random().NextBytes(sensitiveData);
         }
 
@@ -56,7 +59,7 @@ namespace OtpNet
         /// <remarks>
         /// RFC 4226 specifies big endian as the method for converting the counter to data to hash.
         /// </remarks>
-        static internal byte[] GetBigEndianBytes(long input)
+        internal static byte[] GetBigEndianBytes(long input)
         {
             // Since .net uses little endian numbers, we need to reverse the byte order to get big endian.
             var data = BitConverter.GetBytes(input);
@@ -70,7 +73,7 @@ namespace OtpNet
         /// <remarks>
         /// RFC 4226 specifies big endian as the method for converting the counter to data to hash.
         /// </remarks>
-        static internal byte[] GetBigEndianBytes(int input)
+        internal static byte[] GetBigEndianBytes(int input)
         {
             // Since .net uses little endian numbers, we need to reverse the byte order to get big endian.
             var data = BitConverter.GetBytes(input);
