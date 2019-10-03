@@ -7,7 +7,10 @@ namespace DeveVipAccess.ConsoleApp
     {
         public static async Task MainAsync(string[] args)
         {
-            var test = await VipAccess.ProvisionTokenNow();
+            var secret = await VipAccess.ProvisionTokenNow();
+            Console.WriteLine($"Secret: {secret}");
+            var token = VipAccess.CreateCurrentTotpKey(secret.Secret);
+            Console.WriteLine($"Token: {token}");
         }
 
         public static void Main(string[] args)
