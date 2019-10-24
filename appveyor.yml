@@ -30,12 +30,21 @@ build_script:
 after_test:
   - cmd: dotnet pack -c Release DeveVipAccess\
   - ps: Scripts\GoPackage.ps1
+  - cmd: dotnet publish DeveVipAccess.ConsoleApp -r win-x64 -c Release --self-contained
+  - ps: Scripts\GoPackage_ConsoleApp.ps1
+  - cmd: dotnet publish DeveVipAccess.ConsoleApp -r win-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true
 
 artifacts:
 - path: Scripts\Output\DeveVipAccess.7z
   name: droppackage7z
 - path: Scripts\Output\DeveVipAccess.zip
   name: droppackagezip
+- path: Scripts\Output\DeveVipAccess.ConsoleApp.7z
+  name: DeveVipAccessConsoleApp7z
+- path: Scripts\Output\DeveVipAccess.ConsoleApp.zip
+  name: DeveVipAccessConsoleAppzip
+- path: DeveVipAccess.ConsoleApp\bin\Release\netcoreapp3.0\win-x64\publish\DeveVipAccess.ConsoleApp.exe
+  name: DeveVipAccessConsoleApp
 - path: 'DeveVipAccess\bin\Release\*.nupkg'
   name: nugetPackages
 
