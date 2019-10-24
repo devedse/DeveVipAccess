@@ -11,7 +11,7 @@ $zipFilePath = Join-Path $outputDir "DeveVipAccess.zip"
 
 DeleteFileIfExists $7zFilePath
 DeleteFileIfExists $zipFilePath
-DeleteFolderIfExists $outputDir
+#DeleteFolderIfExists $outputDir
 
 $buildPath = Join-Path $solutionRoot "DeveVipAccess\bin\Release\netstandard2.0"
 

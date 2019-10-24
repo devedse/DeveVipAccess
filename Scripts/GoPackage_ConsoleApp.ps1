@@ -11,7 +11,7 @@ $zipFilePath = Join-Path $outputDir "DeveVipAccess.ConsoleApp.zip"
 
 DeleteFileIfExists $7zFilePath
 DeleteFileIfExists $zipFilePath
-DeleteFolderIfExists $outputDir
+#DeleteFolderIfExists $outputDir
 
 $buildPath = Join-Path $solutionRoot "DeveVipAccess.ConsoleApp\bin\Release\netcoreapp3.0\win-x64\publish"
 
