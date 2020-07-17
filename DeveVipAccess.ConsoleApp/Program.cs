@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,49 +10,59 @@ namespace DeveVipAccess.ConsoleApp
         public static async Task MainAsync(string[] args)
         {
             string secret = "";
-            while (string.IsNullOrWhiteSpace(secret))
+            if (args.Any())
             {
-                Console.WriteLine("Please choose what you want to do:");
-                Console.WriteLine("1: Generate new secret + show 2fa token");
-                Console.WriteLine("2: Enter existing secret to show 2fa token");
-
-                Console.Write("> ");
-                var inp = Console.ReadLine();
-
-                switch (inp)
-                {
-                    case "1":
-                        Console.WriteLine("Generating secret...");
-                        var s = await VipAccess.ProvisionTokenNow();
-                        secret = s.Secret;
-                        Console.WriteLine($"Secret:{Environment.NewLine}{ApplyThisInFrontOfLines(s.ToString(), "\t")}");
-                        break;
-                    case "2":
-                        Console.Write("Enter your secret> ");
-                        secret = Console.ReadLine().Trim();
-                        break;
-                    default:
-                        Console.WriteLine("Error: Option not found, please choose one of the options above");
-                        break;
-                }
+                secret = string.Join("", args).Replace(" ", "");
+                var token = VipAccess.CreateCurrentTotpKey(secret);
+                Console.WriteLine($"Writing token '${token}' to token.txt");
+                File.WriteAllText("token.txt", token);
             }
-
-            string currentToken = "";
-            Console.WriteLine();
-            Console.WriteLine(@"\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_"); 
-            Console.WriteLine(@"\_\_\_ Auto refreshing token, press ESC to exit the application \_\_\_");
-            Console.WriteLine(@"\_\_\_          Token will refresh every ~30 seconds            \_\_\_");
-            Console.WriteLine(@"\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_"); 
-            Console.WriteLine();
-            while (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.Escape)
+            else
             {
-                var newToken = VipAccess.CreateCurrentTotpKey(secret);
-                if (currentToken != newToken)
+                while (string.IsNullOrWhiteSpace(secret))
                 {
-                    currentToken = newToken;
-                    Console.WriteLine($"\tCurrent token: {currentToken}");
+                    Console.WriteLine("Please choose what you want to do:");
+                    Console.WriteLine("1: Generate new secret + show 2fa token");
+                    Console.WriteLine("2: Enter existing secret to show 2fa token");
+
+                    Console.Write("> ");
+                    var inp = Console.ReadLine();
+
+                    switch (inp)
+                    {
+                        case "1":
+                            Console.WriteLine("Generating secret...");
+                            var s = await VipAccess.ProvisionTokenNow();
+                            secret = s.Secret;
+                            Console.WriteLine($"Secret:{Environment.NewLine}{ApplyThisInFrontOfLines(s.ToString(), "\t")}");
+                            break;
+                        case "2":
+                            Console.Write("Enter your secret> ");
+                            secret = Console.ReadLine().Trim();
+                            break;
+                        default:
+                            Console.WriteLine("Error: Option not found, please choose one of the options above");
+                            break;
+                    }
                 }
-                await Task.Delay(100);
+
+                string currentToken = "";
+                Console.WriteLine();
+                Console.WriteLine(@"\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_");
+                Console.WriteLine(@"\_\_\_ Auto refreshing token, press ESC to exit the application \_\_\_");
+                Console.WriteLine(@"\_\_\_          Token will refresh every ~30 seconds            \_\_\_");
+                Console.WriteLine(@"\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_");
+                Console.WriteLine();
+                while (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.Escape)
+                {
+                    var newToken = VipAccess.CreateCurrentTotpKey(secret);
+                    if (currentToken != newToken)
+                    {
+                        currentToken = newToken;
+                        Console.WriteLine($"\tCurrent token: {currentToken}");
+                    }
+                    await Task.Delay(100);
+                }
             }
         }
 
